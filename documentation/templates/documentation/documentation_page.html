@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static wagtailimages_tags %}
+
+{% block body_class %}template-documentation-page{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <!-- Main Content -->
+        <main role="main" class="col-lg-8">
+            <h1 class="mb-4">{{ page.title }}</h1>
+            <div class="content-block">
+                {% for block in page.body %}
+                    {% if block.block_type == 'paragraph' %}
+                        <p class="mb-4">{{ block.value|safe }}</p>
+                    {% elif block.block_type == 'image' %}
+                        <div class="text-center mb-4">
+                            {% with block.value as image %}
+                            {% image image original as img %}
+                            <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                            {% endwith %}
+                        </div>
+                    {% elif block.block_type == 'code' %}
+                        <div class="code-block mb-4">
+                            <pre><code class="language-{{ block.value.language }}">{{ block.value.code|safe }}</code></pre>
+                        </div>
+                    {% elif block.block_type == 'heading' %}
+                        {% if block.value.level == '1' %}
+                            <h2 class="mb-4">{{ block.value.text }}</h2>
+                        {% elif block.value.level == '2' %}
+                            <h3 class="mb-3">{{ block.value.text }}</h3>
+                        {% elif block.value.level == '3' %}
+                            <h4 class="mb-2">{{ block.value.text }}</h4>
+                        {% endif %}
+                    {% elif block.block_type == 'list' %}
+                        <ul class="mb-4">
+                            {% for item in block.value %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% elif block.block_type == 'table' %}
+                        <table class="table table-bordered mb-4">
+                            <thead>
+                                <tr>
+                                    {% for header in block.value.headers %}
+                                        <th>{{ header }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in block.value.rows %}
+                                    <tr>
+                                        {% for cell in row %}
+                                            <td>{{ cell }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock content %}
+
