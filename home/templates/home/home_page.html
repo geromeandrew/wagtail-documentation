@@ -6,123 +6,181 @@
 {% block content %}
 
 <div class="container-fluid mt-5 pt-4">
-    <div class="row">
+    <div class="row justify-content-center">
+
         <!-- Table of Contents (Left Sidebar) -->
         <nav id="sidebar" class="col-md-3 d-none d-md-block bg-light sidebar sidebar-sticky mt-1">
-            <h5 class="sidebar-heading">Table of Contents</h5>
-            <ul class="nav flex-column">
-                {% for child in page.get_children.live %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#page-{{ child.id }}">{{ child.title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="sidebar-heading font-weight-bold">Table of Contents</h5>
+                    <ul class="nav flex-column">
+                        {% for child in page.get_children.live %}
+                            <li class="nav-item">
+                                <a class="nav-link d-flex justify-content-between align-items-center" 
+                                data-toggle="collapse" data-target="#collapse-{{ child.id }}" aria-expanded="false" 
+                                aria-controls="collapse-{{ child.id }}">
+                                    {{ child.title }}
+                                    <span class="ml-auto">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </span>
+                                </a>
+                                <div class="collapse" id="collapse-{{ child.id }}">
+                                    <ul class="nav flex-column ml-4">
+                                        {% for item in child.specific.body %}
+                                            {% if item.block_type == 'heading' %}
+                                                <li class="nav-item">
+                                                    <a class="nav-link" href="#heading-{{ child.id }}-{{ forloop.counter }}">
+                                                        {{ item.value.text }}
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </nav>
 
         <!-- Main Content -->
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-8 px-4 mt-1 main-content">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-8 px-4 mt-1">
             {% for block in page.get_children.live %}
                 {% if block.specific.body %}
-                    <article class="mb-4">
-                        <a class="" href="{{ block.url }}">
-                            <h1 id="page-{{ block.id }}" class="mb-3">{{ block.title }}</h1>
-                        </a>
-                        {% for b in block.specific.body %}
-                            {% if b.block_type == 'paragraph' %}
-                                <p class="mb-4">{{ b.value|safe }}</p>
-                            {% elif b.block_type == 'image' %}
-                                <div class="text-center mb-4">
-                                    {% with image=b.value %}
-                                    {% load wagtailimages_tags %}
-                                    {% image image original as img %}
-                                    <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
-                                    {% endwith %}
-                                </div>
-                            {% elif b.block_type == 'code' %}
-                                <div class="code-block mb-4">
-                                    <pre><code class="language-{{ b.value.language }}">{{ b.value.code|safe }}</code></pre>
-                                </div>
-                            {% elif b.block_type == 'heading' %}
-                                {% if b.value.level == '1' %}
-                                    <h2 class="mb-4">{{ b.value.text }}</h2>
-                                {% elif b.value.level == '2' %}
-                                    <h3 class="mb-3">{{ b.value.text }}</h3>
-                                {% elif b.value.level == '3' %}
-                                    <h4 class="mb-2">{{ b.value.text }}</h4>
-                                {% endif %}
-                            {% elif b.block_type == 'list' %}
-                                <ul class="mb-4">
-                                    {% for item in b.value %}
-                                        <li>{{ item }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% elif b.block_type == 'table' %}
-                                <table class="table table-bordered mb-4">
-                                    <thead>
-                                        <tr>
-                                            {% for header in b.value.headers %}
-                                                <th>{{ header }}</th>
-                                            {% endfor %}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for row in b.value.rows %}
-                                            <tr>
-                                                {% for cell in row %}
-                                                    <td>{{ cell }}</td>
-                                                {% endfor %}
-                                            </tr>
+                    <div class="card mb-5 border-0 shadow-sm">
+                        <div class="card-body">
+                            <a class="card-title-link" href="{{ block.url }}">
+                                <h1 class="card-title mb-5" id="page-{{ block.id }}">{{ block.title }}</h1>
+                            </a>
+                            {% for b in block.specific.body %}
+                                {% if b.block_type == 'paragraph' %}
+                                    <p class="card-text">{{ b.value|safe }}</p>
+                                {% elif b.block_type == 'image' %}
+                                    <div class="d-flex justify-content-center mb-4">
+                                        <div class="img-fluid mx-auto">
+                                            {% with image=b.value %}
+                                                {% load wagtailimages_tags %}
+                                                {% image image max-800x600 as img %}
+                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+                                {% elif b.block_type == 'code' %}
+                                    <div class="code-block mb-4">
+                                        <pre><code class="language-{{ b.value.language }}">{{ b.value.code|safe }}</code></pre>
+                                    </div>
+                                {% elif b.block_type == 'heading' %}
+                                    <h{{ b.value.level }} id="heading-{{ block.id }}-{{ forloop.counter }}" class="mb-4">{{ b.value.text }}</h{{ b.value.level }}>
+                                {% elif b.block_type == 'list' %}
+                                    <ul class="list-group mb-4">
+                                        {% for item in b.value %}
+                                            <li class="list-group-item">{{ item }}</li>
                                         {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% elif b.block_type == 'tree' %}
-                                {% if b.value.children %}
-                                <ol>
-                                    {% for child in b.value.children %}
-                                        <li>
-                                            <h5>{{ child.title }}</h5>
-                                            <p>{{ child.content }}</p>
-                                            {% if child.item %}
-                                            <ul>
-                                                {% for second_child in child.item %}
-                                                    <li>
-                                                        <h5>{{ second_child.title }}</h5>
-                                                        <p>{{ second_child.content }}</p>
-                                                        {% if second_child.item %}
-                                                        <ul>
-                                                            {% for third_child in second_child.item %}
-                                                            <li>
-                                                                <h5>{{ third_child.title }}</h5>
-                                                                <p>{{ third_child.content }}</p>
-                                                                {% if third_child.item %}
-                                                                <ul>
-                                                                    {% for fourth_child in third_child.item %}
-                                                                    <li>
-                                                                        <h5>{{ fourth_child.title }}</h5>
-                                                                        <p>{{ fourth_child.content|safe }}</p>
-                                                                    </li>
-                                                                    {% endfor %}
-                                                                </ul>
-                                                                {% endif %}
-                                                            </li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                        {% endif %}
-                                                    </li>
+                                    </ul>
+                                {% elif b.block_type == 'table' %}
+                                    <div class="table-responsive mb-4">
+                                        <table class="table table-bordered" id="mainTable">
+                                            <thead>
+                                                <tr>
+                                                    {% for header in b.value.headers %}
+                                                        <th>{{ header }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for row in b.value.rows %}
+                                                    <tr>
+                                                        {% for cell in row %}
+                                                            <td>{{ cell }}</td>
+                                                        {% endfor %}
+                                                    </tr>
                                                 {% endfor %}
-                                            </ul>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ol>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% elif b.block_type == 'tree' %}
+                                    {% if b.value.children %}
+                                    <ol class="tree-block">
+                                        {% for child in b.value.children %}
+                                            <li class="mb-4">
+                                                <h5>{{ child.title }}</h5>
+                                                <p>{{ child.content }}</p>
+                                                {% if child.item %}
+                                                <ul>
+                                                    {% for second_child in child.item %}
+                                                        <li>
+                                                            <h5>{{ second_child.title }}</h5>
+                                                            <p>{{ second_child.content }}</p>
+                                                            {% if second_child.item %}
+                                                            <ul>
+                                                                {% for third_child in second_child.item %}
+                                                                <li>
+                                                                    <h5>{{ third_child.title }}</h5>
+                                                                    <p>{{ third_child.content }}</p>
+                                                                    {% if third_child.item %}
+                                                                    <ul>
+                                                                        {% for fourth_child in third_child.item %}
+                                                                        <li>
+                                                                            <h5>{{ fourth_child.title }}</h5>
+                                                                            <p>{{ fourth_child.content|safe }}</p>
+                                                                        </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                    {% endif %}
+                                                                </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </article>
+                            {% endfor %}
+                        </div>
+                    </div>
                 {% endif %}
             {% endfor %}
         </main>
+
     </div>
 </div>
 {% endblock content %}
 
+{% block extra_js %}
+    <script>
+        document.querySelectorAll('[data-toggle="collapse"]').forEach(function(element) {
+            element.addEventListener('click', function(event) {
+                const target = document.querySelector(this.getAttribute('data-target'));
+                const icon = this.querySelector('i');
+                
+                if (target.classList.contains('show')) {
+                    target.classList.remove('show');
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                } else {
+                    document.querySelectorAll('.collapse').forEach(collapse => collapse.classList.remove('show'));
+                    document.querySelectorAll('i').forEach(i => {
+                        i.classList.remove('fa-chevron-up');
+                        i.classList.add('fa-chevron-down');
+                    });
+                    target.classList.add('show');
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            });
+        });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-html.min.js"></script>
+
+{% endblock extra_js %}
