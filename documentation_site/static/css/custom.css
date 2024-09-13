@@ -1,14 +1,20 @@
 /* Color Theme */
 :root {
-    --primary-color: #2F4F4F; /* Dark Slate Gray */
-    --secondary-color: #4682B4; /* Steel Blue */
-    --accent-color: #B0C4DE; /* Light Steel Blue */
+    --primary-color: #1E3A8A; /* Navy Blue */
+    --secondary-color: #64748B; /* Slate Gray */
+    --accent-color: #FBBF24; /* Amber */
 }
 
+
 /* General Styles */
-body {
+#documentBody {
     background-color: #f8f9fa; /* Light Gray */
     color: #333;
+}
+
+.full-width {
+    width: 100%;
+    height: auto;
 }
 
 .card {
@@ -25,7 +31,6 @@ body {
 }
 
 .card-title:hover {
-    color: var(--secondary-color);
     text-decoration: none;
     text-shadow: 0 0 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease-in-out;
@@ -112,6 +117,7 @@ body {
 .sidebar .nav-item .nav-link {
     color: #333;
     padding: 0.5rem 1rem;
+    border-radius: .5rem;
 }
 
 .sidebar .nav-link:hover {
@@ -130,6 +136,17 @@ body {
 .sidebar .nav-link .fa-chevron-up {
     color: var(--secondary-color);
 }
+
+#sidebar a:hover {
+    color: white; /* Change the text color on hover */
+    font-weight: bold;
+    background-color: var(--accent-color) /* Change the background color on hover */
+  }
+  
+  #sidebar a:hover i {
+    color: white; /* Change the color of the chevron icon on hover */
+    font-weight: bold;
+  }
 
 /* Table of Contents (Left Sidebar) */
 #sidebar {

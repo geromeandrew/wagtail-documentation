@@ -51,13 +51,13 @@
                     <div class="card mb-5 border-0 shadow-sm">
                         <div class="card-body">
                             <a class="card-title-link" href="{{ block.url }}">
-                                <h1 class="card-title mb-5" id="page-{{ block.id }}">{{ block.title }}</h1>
+                                <h1 class="card-title mb-5">{{ block.title }}</h1>
                             </a>
                             {% for b in block.specific.body %}
                                 {% if b.block_type == 'paragraph' %}
-                                    <p class="card-text">{{ b.value|safe }}</p>
+                                    <p id="page-{{ block.id }}" class="card-text">{{ b.value|safe }} </p>
                                 {% elif b.block_type == 'image' %}
-                                    <div class="d-flex justify-content-center mb-4">
+                                    <div id="page-{{ block.id }}" class="d-flex justify-content-center mb-4">
                                         <div class="img-fluid mx-auto">
                                             {% with image=b.value %}
                                                 {% load wagtailimages_tags %}
@@ -67,20 +67,20 @@
                                         </div>
                                     </div>
                                 {% elif b.block_type == 'code' %}
-                                    <div class="code-block mb-4">
+                                    <div id="page-{{ block.id }}" class="code-block mb-4">
                                         <pre><code class="language-{{ b.value.language }}">{{ b.value.code|safe }}</code></pre>
                                     </div>
                                 {% elif b.block_type == 'heading' %}
-                                    <h{{ b.value.level }} id="heading-{{ block.id }}-{{ forloop.counter }}" class="mb-4">{{ b.value.text }}</h{{ b.value.level }}>
+                                    <h{{ b.value.level }} id="heading-{{ block.id }}-{{ forloop.counter }}" id="page-{{ block.id }}" class="mb-4">{{ b.value.text }} </h{{ b.value.level }}>
                                 {% elif b.block_type == 'list' %}
-                                    <ul class="list-group mb-4">
+                                    <ul id="page-{{ block.id }}" class="list-group mb-4">
                                         {% for item in b.value %}
                                             <li class="list-group-item">{{ item }}</li>
                                         {% endfor %}
                                     </ul>
                                 {% elif b.block_type == 'table' %}
                                     <div class="table-responsive mb-4">
-                                        <table class="table table-bordered" id="mainTable">
+                                        <table id="page-{{ block.id }}" class="table table-bordered" id="mainTable">
                                             <thead>
                                                 <tr>
                                                     {% for header in b.value.headers %}
@@ -103,7 +103,7 @@
                                     {% if b.value.children %}
                                     <ol class="tree-block">
                                         {% for child in b.value.children %}
-                                            <li class="mb-4">
+                                            <li id="page-{{ block.id }}" class="mb-4">
                                                 <h5>{{ child.title }}</h5>
                                                 <p>{{ child.content }}</p>
                                                 {% if child.item %}
