@@ -17,6 +17,10 @@
     height: auto;
 }
 
+.section-heading {
+    padding-top: 4.5rem;
+}
+
 .card {
     border: 1px solid #dee2e6;
     border-radius: 0.5rem;
@@ -121,7 +125,8 @@
 }
 
 .sidebar .nav-link:hover {
-    color: var(--secondary-color);
+    color: white;
+
 }
 
 .sidebar .nav-link .fa-chevron-down,

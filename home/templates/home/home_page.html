@@ -11,7 +11,7 @@
         <!-- Table of Contents (Left Sidebar) -->
         <nav id="sidebar" class="col-md-3 d-none d-md-block bg-light sidebar sidebar-sticky mt-1">
             <div class="card border-0 shadow-sm">
-                <div class="card-body">
+                <div class="card-body m-3">
                     <h5 class="sidebar-heading font-weight-bold">Table of Contents</h5>
                     <ul class="nav flex-column">
                         {% for child in page.get_children.live %}
@@ -45,13 +45,13 @@
         </nav>
 
         <!-- Main Content -->
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-8 px-4 mt-1">
+        <main role="main" class="col-md-9 col-lg-8 px-4 mt-1">
             {% for block in page.get_children.live %}
                 {% if block.specific.body %}
-                    <div class="card mb-5 border-0 shadow-sm">
-                        <div class="card-body">
+                    <div class="card mb-5 border-0 shadow-sm content-card">
+                        <div class="card-body m-5">
                             <a class="card-title-link" href="{{ block.url }}">
-                                <h1 class="card-title mb-5">{{ block.title }}</h1>
+                                <h1 class="card-title font-weight-bold">{{ block.title }}</h1>
                             </a>
                             {% for b in block.specific.body %}
                                 {% if b.block_type == 'paragraph' %}
@@ -71,7 +71,7 @@
                                         <pre><code class="language-{{ b.value.language }}">{{ b.value.code|safe }}</code></pre>
                                     </div>
                                 {% elif b.block_type == 'heading' %}
-                                    <h{{ b.value.level }} id="heading-{{ block.id }}-{{ forloop.counter }}" id="page-{{ block.id }}" class="mb-4">{{ b.value.text }} </h{{ b.value.level }}>
+                                    <h{{ b.value.level }} id="heading-{{ block.id }}-{{ forloop.counter }}" id="page-{{ block.id }}" class="mb-4 section-heading">{{ b.value.text }} </h{{ b.value.level }}>
                                 {% elif b.block_type == 'list' %}
                                     <ul id="page-{{ block.id }}" class="list-group mb-4">
                                         {% for item in b.value %}
