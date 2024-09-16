@@ -4,64 +4,180 @@
 {% block body_class %}template-documentation-page{% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
-    <div class="row justify-content-center">
+<div class="container-fluid mt-5 pt-4">
+    <div class="row justify-content-between">
+
         <!-- Main Content -->
-        <main role="main" class="col-lg-8">
-            <h1 class="mb-4">{{ page.title }}</h1>
+        <main role="main" class="col-md-9 col-lg-8 px-5 mt-1 ml-5">
             <div class="content-block">
+                <h1 class="card-title font-weight-bold">{{ page.title }}</h1>
                 {% for block in page.body %}
                     {% if block.block_type == 'paragraph' %}
-                        <p class="mb-4">{{ block.value|safe }}</p>
+                        <p class="card-text">{{ block.value|safe }}</p>
                     {% elif block.block_type == 'image' %}
-                        <div class="text-center mb-4">
-                            {% with block.value as image %}
-                            {% image image original as img %}
-                            <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
-                            {% endwith %}
+                        <div class="d-flex justify-content-center mb-4">
+                            <div class="img-fluid mx-auto">
+                                {% with block.value as image %}
+                                    {% image image max-800x600 as img %}
+                                    <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                    </a>
+                                {% endwith %}
+                            </div>
                         </div>
                     {% elif block.block_type == 'code' %}
                         <div class="code-block mb-4">
                             <pre><code class="language-{{ block.value.language }}">{{ block.value.code|safe }}</code></pre>
                         </div>
                     {% elif block.block_type == 'heading' %}
-                        {% if block.value.level == '1' %}
-                            <h2 class="mb-4">{{ block.value.text }}</h2>
-                        {% elif block.value.level == '2' %}
-                            <h3 class="mb-3">{{ block.value.text }}</h3>
-                        {% elif block.value.level == '3' %}
-                            <h4 class="mb-2">{{ block.value.text }}</h4>
-                        {% endif %}
+                        <h{{ block.value.level }} id="heading-{{ forloop.counter }}" class="mb-4 section-heading">
+                            {{ block.value.text }}
+                        </h{{ block.value.level }}>
                     {% elif block.block_type == 'list' %}
-                        <ul class="mb-4">
+                        <ul class="list-group mb-4">
                             {% for item in block.value %}
-                                <li>{{ item }}</li>
+                                <li class="list-group-item">{{ item }}</li>
                             {% endfor %}
                         </ul>
                     {% elif block.block_type == 'table' %}
-                        <table class="table table-bordered mb-4">
-                            <thead>
-                                <tr>
-                                    {% for header in block.value.headers %}
-                                        <th>{{ header }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in block.value.rows %}
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        {% for cell in row %}
-                                            <td>{{ cell }}</td>
+                                        {% for header in block.value.headers %}
+                                            <th>{{ header }}</th>
                                         {% endfor %}
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for row in block.value.rows %}
+                                        <tr>
+                                            {% for cell in row %}
+                                                <td>{{ cell }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% elif block.block_type == 'tree' %}
+                        <ol class="tree-block mb-4">
+                            {% for child in block.value.children %}
+                                <li class="mb-4">
+                                    <h5>{{ child.title }}</h5>
+                                    <div class="img-fluid mx-auto">
+                                        {% with image=child.child_img %}
+                                            {% load wagtailimages_tags %}
+                                            {% image image max-800x600 as img %}
+                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                            </a>
+                                        {% endwith %}
+                                    </div>    
+                                    <p>{{ child.content }}</p>
+                                    {% if child.child %}
+                                        <ul>
+                                            {% for second_child in child.child %}
+                                                <li>
+                                                    <h5>{{ second_child.title }}</h5>
+                                                    <div class="img-fluid mx-auto">
+                                                        {% with image=second_child.child_img %}
+                                                            {% load wagtailimages_tags %}
+                                                            {% image image max-800x600 as img %}
+                                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                            </a>
+                                                        {% endwith %}
+                                                    </div>    
+                                                    <p>{{ second_child.content }}</p>
+                                                    {% if second_child.child %}
+                                                        <ul>
+                                                            {% for third_child in second_child.child %}
+                                                                <li>
+                                                                    <h5>{{ third_child.title }}</h5>
+                                                                    <div class="img-fluid mx-auto">
+                                                                        {% with image=third_child.child_img %}
+                                                                            {% load wagtailimages_tags %}
+                                                                            {% image image max-800x600 as img %}
+                                                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                            </a>
+                                                                        {% endwith %}
+                                                                    </div>    
+                                                                    <p>{{ third_child.content }}</p>
+                                                                    {% if third_child.child %}
+                                                                        <ul>
+                                                                            {% for fourth_child in third_child.child %}
+                                                                                <li>
+                                                                                    <h5>{{ fourth_child.title }}</h5>
+                                                                                    <div class="img-fluid mx-auto">
+                                                                                        {% with image=fourth_child.child_img %}
+                                                                                            {% load wagtailimages_tags %}
+                                                                                            {% image image max-800x600 as img %}
+                                                                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                                            </a>
+                                                                                        {% endwith %}
+                                                                                    </div>
+                                                                                    <p>{{ fourth_child.content|safe }}</p>
+                                                                                    {% if fourth_child.child %}
+                                                                                        <ul>
+                                                                                            {% for fifth_child in fourth_child.child %}
+                                                                                                <li>
+                                                                                                    <h5>{{ fifth_child.title }}</h5>
+                                                                                                    <div class="img-fluid mx-auto">
+                                                                                                        {% with image=fifth_child.child_img %}
+                                                                                                            {% load wagtailimages_tags %}
+                                                                                                            {% image image max-800x600 as img %}
+                                                                                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                                                            </a>
+                                                                                                        {% endwith %}
+                                                                                                    </div>
+                                                                                                    <p>{{ fifth_child.content|safe }}</p>
+                                                                                                </li>
+                                                                                            {% endfor %}
+                                                                                        </ul>
+                                                                                    {% endif %}
+                                                                                </li>
+                                                                            {% endfor %}
+                                                                        </ul>
+                                                                    {% endif %}
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
                     {% endif %}
                 {% endfor %}
             </div>
         </main>
+
+        <!-- Sidebar (Right Sidebar for Headings) -->
+        <nav id="sidebar-right" class="col-md-3 d-none d-md-block sidebar sidebar-sticky mt-1">
+            <div class="separator"></div>
+            <h5 class="font-weight-bold">{{ page.title }}</h5>
+            <ul class="nav flex-column">
+                {% for block in page.body %}
+                    {% if block.block_type == 'heading' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#heading-{{ forloop.counter }}">
+                                {{ block.value.text }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+
     </div>
 </div>
-{% endblock content %}
 
+
+{% endblock content %}

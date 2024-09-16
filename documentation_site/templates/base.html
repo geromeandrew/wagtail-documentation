@@ -18,6 +18,9 @@
         <meta name="description" content="{{ page.search_description }}" />
         {% endif %}
 
+        <!-- Lightbox2 CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+
         {% block extra_css %}
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,11 +30,13 @@
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
             <link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.dataTables.css">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-            
             <style>
                 #documentBody {
                     font-family: 'Poppins', sans-serif;
                     font-weight: 400;
+                }
+                #wagtail-explorer-nav {
+                    display: none !important;
                 }
             </style>
         {% endblock extra_css %}
@@ -111,6 +116,14 @@
             </div>
         </nav>
 
+        <!-- Arrow Up Button -->
+        <a href="#" id="arrow-up" class="arrow-up-btn" title="Back to top">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 12a.5.5 0 0 1-.5-.5V3.707L4.354 7.854a.5.5 0 1 1-.708-.708l4-4a.5.5 0 0 1 .708 0l4 4a.5.5 0 0 1-.708.708L8.5 3.707V11.5A.5.5 0 0 1 8 12z"/>
+            </svg>
+        </a>
+
+
 
 
         <div class="container-fluid" style="margin-top: 75px;">
@@ -120,6 +133,9 @@
         <!-- JavaScript Dependencies -->
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
         <script src="https://cdn.datatables.net/2.1.5/js/jquery.dataTables.min.js"></script>
+        <!-- Lightbox2 JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+</body>
 
         {% block extra_js %}
             <!-- Bootstrap JS and dependencies -->
@@ -132,6 +148,27 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-css.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-html.min.js"></script>
+            
+
+            <script>
+                window.onscroll = function() {
+                    const arrowUpBtn = document.getElementById('arrow-up');
+                    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                        arrowUpBtn.style.display = 'block';
+                    } else {
+                        arrowUpBtn.style.display = 'none';
+                    }
+                };
+
+                document.getElementById('arrow-up').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            </script>
+
         {% endblock extra_js %}
     </body>
 </html>

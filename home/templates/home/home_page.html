@@ -10,8 +10,8 @@
 
         <!-- Table of Contents (Left Sidebar) -->
         <nav id="sidebar" class="col-md-3 d-none d-md-block bg-light sidebar sidebar-sticky mt-1">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body m-3">
+            <div id="leftCard" class="card border-0 shadow-sm">
+                <div class="card-body m-3" >
                     <h5 class="sidebar-heading font-weight-bold">Table of Contents</h5>
                     <ul class="nav flex-column">
                         {% for child in page.get_children.live %}
@@ -51,7 +51,7 @@
                     <div class="card mb-5 border-0 shadow-sm content-card">
                         <div class="card-body m-5">
                             <a class="card-title-link" href="{{ block.url }}">
-                                <h1 class="card-title font-weight-bold">{{ block.title }}</h1>
+                                <h1 class="card-title font-weight-bold" id="title-{{block.id}}-{{block.title}}">{{ block.title }}</h1>
                             </a>
                             {% for b in block.specific.body %}
                                 {% if b.block_type == 'paragraph' %}
@@ -62,9 +62,11 @@
                                             {% with image=b.value %}
                                                 {% load wagtailimages_tags %}
                                                 {% image image max-800x600 as img %}
-                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                    <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                </a>
                                             {% endwith %}
-                                        </div>
+                                        </div>                                        
                                     </div>
                                 {% elif b.block_type == 'code' %}
                                     <div id="page-{{ block.id }}" class="code-block mb-4">
@@ -105,26 +107,80 @@
                                         {% for child in b.value.children %}
                                             <li id="page-{{ block.id }}" class="mb-4">
                                                 <h5>{{ child.title }}</h5>
+                                                <div class="img-fluid mx-auto">
+                                                    {% with image=child.child_img %}
+                                                        {% load wagtailimages_tags %}
+                                                        {% image image max-800x600 as img %}
+                                                        <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                            <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                        </a>
+                                                    {% endwith %}
+                                                </div>    
                                                 <p>{{ child.content }}</p>
-                                                {% if child.item %}
+                                                {% if child.child %}
                                                 <ul>
-                                                    {% for second_child in child.item %}
+                                                    {% for second_child in child.child %}
                                                         <li>
                                                             <h5>{{ second_child.title }}</h5>
+                                                            <div class="img-fluid mx-auto">
+                                                                {% with image=second_child.child_img %}
+                                                                    {% load wagtailimages_tags %}
+                                                                    {% image image max-800x600 as img %}
+                                                                    <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                    </a>
+                                                                {% endwith %}
+                                                            </div>    
                                                             <p>{{ second_child.content }}</p>
-                                                            {% if second_child.item %}
+                                                            {% if second_child.child %}
                                                             <ul>
-                                                                {% for third_child in second_child.item %}
+                                                                {% for third_child in second_child.child %}
                                                                 <li>
                                                                     <h5>{{ third_child.title }}</h5>
+                                                                    <div class="img-fluid mx-auto">
+                                                                        {% with image=third_child.child_img %}
+                                                                            {% load wagtailimages_tags %}
+                                                                            {% image image max-800x600 as img %}
+                                                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                            </a>
+                                                                        {% endwith %}
+                                                                    </div>    
                                                                     <p>{{ third_child.content }}</p>
-                                                                    {% if third_child.item %}
+                                                                    {% if third_child.child %}
                                                                     <ul>
-                                                                        {% for fourth_child in third_child.item %}
+                                                                        {% for fourth_child in third_child.child %}
                                                                         <li>
                                                                             <h5>{{ fourth_child.title }}</h5>
+                                                                            <div class="img-fluid mx-auto">
+                                                                                {% with image=fourth_child.child_img %}
+                                                                                    {% load wagtailimages_tags %}
+                                                                                    {% image image max-800x600 as img %}
+                                                                                    <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                                        <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                                    </a>
+                                                                                {% endwith %}
+                                                                            </div> 
                                                                             <p>{{ fourth_child.content|safe }}</p>
-                                                                        </li>
+                                                                            {% if fourth_child.child %}
+                                                                            <ul>
+                                                                                {% for fifth_child in fourth_child.child %}
+                                                                                <li>
+                                                                                    <h5>{{ fifth_child.title }}</h5>
+                                                                                    <div class="img-fluid mx-auto">
+                                                                                        {% with image=fifth_child.child_img %}
+                                                                                            {% load wagtailimages_tags %}
+                                                                                            {% image image max-800x600 as img %}
+                                                                                            <a href="{{ img.url }}" data-lightbox="image-{{img.url}}" data-title="{{ img.alt }}">
+                                                                                                <img src="{{ img.url }}" alt="{{ img.alt }}" class="img-fluid rounded shadow-sm">
+                                                                                            </a>
+                                                                                        {% endwith %}
+                                                                                    </div> 
+                                                                                    <p>{{ fifth_child.content|safe }}</p>
+                                                                                </li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                            {% endif %}
                                                                         {% endfor %}
                                                                     </ul>
                                                                     {% endif %}
@@ -175,6 +231,23 @@
                 }
             });
         });
+
+        window.onscroll = function() {
+            const arrowUpBtn = document.getElementById('arrow-up');
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                arrowUpBtn.style.display = 'block';
+            } else {
+                arrowUpBtn.style.display = 'none';
+            }
+        };
+
+        document.getElementById('arrow-up').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
     </script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
@@ -182,5 +255,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-html.min.js"></script>
+</body>
 
 {% endblock extra_js %}

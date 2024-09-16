@@ -58,19 +58,34 @@ class TableBlock(blocks.StructBlock):
         label = 'Table'
 
 
+class FifthChildBlock(blocks.StructBlock):
+    title = blocks.CharBlock(required=False, max_length=255)
+    child_img = ImageBlock(required=False)
+    content = blocks.RichTextBlock(required=False)
+
+class FourthChildBlock(blocks.StructBlock):
+    title = blocks.CharBlock(required=False, max_length=255)
+    content = blocks.RichTextBlock(required=False)
+    child_img = ImageBlock(required=False)
+    child = blocks.ListBlock(FifthChildBlock())
+
 class ThirdChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
+    child_img = ImageBlock(required=False)
+    child = blocks.ListBlock(FourthChildBlock())
         
 class SecondChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
-    item = blocks.ListBlock(ThirdChildBlock())
+    child_img = ImageBlock(required=False)
+    child = blocks.ListBlock(ThirdChildBlock())
         
 class FirstChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
-    item = blocks.ListBlock(SecondChildBlock())
+    child_img = ImageBlock(required=False)
+    child = blocks.ListBlock(SecondChildBlock())
 
 class TreeBlock(blocks.StructBlock):
     children = blocks.ListBlock(FirstChildBlock())
