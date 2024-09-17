@@ -3,6 +3,7 @@ from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
+from django.db import models
 
 class ParagraphBlock(blocks.RichTextBlock):
     class Meta:
@@ -103,9 +104,21 @@ class DocumentationPage(Page):
         ('heading', HeadingBlock()),
         ('list', ListBlock()),
         ('table', TableBlock()),
-        ('tree', TreeBlock())
+        ('tree', TreeBlock()),
     ], blank=True)
+
+    # Store headings as a list of strings
+    heading_texts = models.TextField(blank=True, editable=False)
 
     content_panels = Page.content_panels + [
         FieldPanel('body'),
     ]
+
+    def save(self, *args, **kwargs):
+        # Extract all heading texts from StreamField and save them in heading_texts
+        headings = []
+        for block in self.body:
+            if block.block_type == 'heading':
+                headings.append(block.value['text'])
+        self.heading_texts = '\n'.join(headings)  # Store as newline-separated text
+        super().save(*args, **kwargs)

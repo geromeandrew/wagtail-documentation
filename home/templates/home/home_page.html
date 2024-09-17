@@ -3,6 +3,12 @@
 
 {% block body_class %}template-homepage{% endblock %}
 
+{% block nav_button %}
+    <li class="nav-item">
+        <a class="nav-link" style="color: white; transition: color 0.3s ease;" href="{% url 'search' %}"><i class="fas fa-search"></i></a>
+    </li>
+{% endblock nav_button %}
+
 {% block content %}
 
 <div class="container-fluid mt-5 pt-4">

@@ -40,55 +40,10 @@
                 }
             </style>
         {% endblock extra_css %}
+
+        {% block extra_styles %}
+        {% endblock extra_styles%}
         
-        {% comment %} <style>
-            .navbar {
-                background-color: #343a40; 
-                padding: 0.8rem 1rem; 
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-            .navbar-brand {
-                font-size: 1.5rem;
-                font-weight: bold;
-                color: #ffffff !important; /* Brand text color */
-            }
-            .navbar-brand:hover {
-                color: #00bfff !important; /* Brand hover color */
-            }
-            .navbar-nav .nav-link {
-                color: #ffffff !important; /* Default link color */
-                font-size: 1.1rem;
-                padding: 0.7rem 1rem; /* Adjust padding for links */
-                transition: color 0.3s ease, background-color 0.3s ease; /* Smooth transition */
-            }
-            .navbar-nav .nav-link:hover {
-                color: #00bfff !important; /* Link hover color */
-                background-color: rgba(255, 255, 255, 0.1); /* Slight hover background */
-                border-radius: 5px; /* Rounded corners on hover */
-            }
-            .navbar-toggler {
-                border: none; /* Remove border */
-            }
-            .navbar-toggler-icon {
-                background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"%3E%3Cpath stroke="rgba%28255, 255, 255, 0.7%29" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/%3E%3C/svg%3E'); /* Custom icon */
-            }
-            .navbar-collapse {
-                justify-content: flex-end; /* Align items to the right */
-            }
-            .dropdown-menu {
-                background-color: #343a40; /* Same as navbar background */
-                border: none;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
-            }
-            .dropdown-item {
-                color: #ffffff !important;
-                padding: 0.5rem 1.5rem;
-                transition: background-color 0.3s ease;
-            }
-            .dropdown-item:hover {
-                background-color: rgba(255, 255, 255, 0.1); /* Hover effect for dropdown */
-            }
-        </style> {% endcomment %}
     </head>
 
     <body class="{% block body_class %}{% endblock %}" style="margin-top: 56px;" id="documentBody">
@@ -96,7 +51,7 @@
 
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-lg">
-            <a class="navbar-brand mx-5" href="/" style="color: white; font-size: 1.5rem;">DOKUMENTASYON</a>
+            <a class="navbar-brand mx-5" href="/" style="color: white; font-size: 1.5rem;">OrderDocs</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -112,6 +67,7 @@
                             </style>
                         </li>
                     {% endfor %}
+                    {% block nav_button %}{% endblock nav_button %}
                 </ul>
             </div>
         </nav>
