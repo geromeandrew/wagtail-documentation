@@ -9,6 +9,10 @@ from bs4 import BeautifulSoup
 from wagtail.images.models import Image
 from wagtail.documents.models import Document
 
+from django.utils.text import slugify
+from django.core.files.base import ContentFile
+import base64
+
 class ParagraphBlock(blocks.RichTextBlock):
     class Meta:
         icon = 'doc-full'
@@ -111,7 +115,6 @@ class DocumentationPage(Page):
         ('tree', TreeBlock()),
     ], blank=True)
 
-    # Store headings as a list of strings
     heading_texts = models.TextField(blank=True, editable=False)
 
     word_file = models.ForeignKey(
@@ -139,7 +142,21 @@ class DocumentationPage(Page):
             if soup:
                 for element in soup.children:  
                     if element.name == "p":
-                        stream_data.append(("paragraph", element.text))
+                        strong_tag = element.find("strong")
+                        if strong_tag and strong_tag.find("img"):
+                            img_tag = strong_tag.find("img")
+                            if img_tag['src'].startswith('data'):
+                                _, image_data = img_tag['src'].split(',', 1)
+                                image_name = img_tag.get('alt', 'uploaded_image')
+                                image = Image(file=ContentFile(base64.b64decode(image_data), name=f"{slugify(image_name)}.png"))
+                                image.save()
+                                stream_data.append(("image", image))
+                            else:
+                                img = Image.objects.filter(file=img_tag['src']).first()
+                                if img:
+                                    stream_data.append(("image", img))
+                        else:
+                            stream_data.append(("paragraph", element.text))
 
                     elif element.name in ["h1", "h2", "h3"]:
                         level = element.name[-1] 
@@ -158,8 +175,8 @@ class DocumentationPage(Page):
                         rows = [[td.text for td in tr.find_all("td")] for tr in element.find_all("tr")]
                         stream_data.append(("table", {"headers": headers, "rows": rows}))
 
-                    elif element.name == "ol" or element.name == "ul":  # Check if the element is an ordered list
-                        li_list = element.find_all('li', recursive=False)  # Find all <li> tags directly within the <ol>
+                    elif element.name == "ol" or element.name == "ul":  
+                        li_list = element.find_all('li', recursive=False)  
                         if li_list[0].find('strong', recursive=False):
                             strong_tag = li_list[0].find('strong', recursive=False)
                             print("Header Valueee:", strong_tag.text)  
@@ -172,11 +189,16 @@ class DocumentationPage(Page):
                             
 
                     elif element.name == "img":
-                        img_src = element['src']
-                        img = Image.objects.filter(file=img_src).first()
-                        if img:
-                            stream_data.append(("image", img))
-
+                        if element['src'].startswith('data'):
+                            _, image_data = element['src'].split(',', 1)
+                            image_name = element.get('alt', 'uploaded_image')
+                            image = Image(file=ContentFile(base64.b64decode(image_data), name=f"{slugify(image_name)}.png"))
+                            image.save()
+                            stream_data.append(("image", image))
+                        else:
+                            img = Image.objects.filter(file=element['src']).first()
+                            if img:
+                                stream_data.append(("image", img))
 
                 self.body = self.body.stream_block.to_python(stream_data)
             else:
@@ -188,7 +210,7 @@ class DocumentationPage(Page):
             if block.block_type == 'heading':
                 headings.append(block.value['text'])
 
-        self.heading_texts = '\n'.join(headings)  #
+        self.heading_texts = '\n'.join(headings) 
 
         super().save(*args, **kwargs)
 
