@@ -132,22 +132,65 @@ class DocumentationPage(Page):
         FieldPanel('body'),
         FieldPanel('word_file'),
     ]
-    
+
+    def _parse_nested_list(self, element):
+        """
+        Recursively parse nested list elements (<ul> and <li>) into TreeBlock structure,
+        mapping content to 'content' and images to 'child_img'.
+        """
+        def parse_list_item(li_element):
+            title = li_element.text.strip()  
+            child_img = None 
+            content = title  
+
+            img_tag = li_element.find('img', recursive=False)
+            if img_tag:
+                if img_tag['src'].startswith('data'):
+                    _, image_data = img_tag['src'].split(',', 1)
+                    image_name = img_tag.get('alt', 'uploaded_image')
+                    image = Image(file=ContentFile(base64.b64decode(image_data), name=f"{slugify(image_name)}.png"))
+                    image.save()
+                    child_img = image
+                else:
+                    image = Image.objects.filter(file=img_tag['src']).first()
+                    if image:
+                        child_img = image
+
+            children_ul = li_element.find('ul', recursive=False)  
+            child_blocks = []
+
+            if children_ul:
+                child_li_items = children_ul.find_all('li', recursive=False)
+                for child_li in child_li_items:
+                    child_blocks.append(parse_list_item(child_li))
+
+            return {
+                'title': title,  
+                'content': content,
+                'child_img': child_img,
+                'child': child_blocks  
+            }
+
+        parsed_items = []
+        li_elements = element.find_all('li', recursive=False)
+        for li_element in li_elements:
+            parsed_items.append(parse_list_item(li_element))
+
+        return parsed_items
+
     def save(self, *args, **kwargs):
         if self.word_file:
             document_path = self.word_file.file.path
             with open(document_path, "rb") as docx_file:
                 result = mammoth.convert_to_html(docx_file)
                 html_content = result.value
-            
 
             soup = BeautifulSoup(html_content, "html.parser")
-            print('soup: ', soup)
 
             stream_data = []
 
             if soup:
-                for element in soup.children:  
+                for element in soup.children:
                     if element.name == "p":
                         if element.find("img"):
                             img_tag = element.find("img")
@@ -157,51 +200,34 @@ class DocumentationPage(Page):
                                 image = Image(file=ContentFile(base64.b64decode(image_data), name=f"{slugify(image_name)}.png"))
                                 image.save()
                                 stream_data.append(("image", image))
-                        strong_tag = element.find("strong")
-                        if strong_tag and strong_tag.find("img"):
-                            img_tag = strong_tag.find("img")
-                            if img_tag['src'].startswith('data'):
-                                _, image_data = img_tag['src'].split(',', 1)
-                                image_name = img_tag.get('alt', 'uploaded_image')
-                                image = Image(file=ContentFile(base64.b64decode(image_data), name=f"{slugify(image_name)}.png"))
-                                image.save()
-                                stream_data.append(("image", image))
-                            else:
-                                img = Image.objects.filter(file=img_tag['src']).first()
-                                if img:
-                                    stream_data.append(("image", img))
                         else:
                             stream_data.append(("paragraph", element.text))
 
                     elif element.name in ["h1", "h2", "h3"]:
-                        level = element.name[-1] 
+                        level = element.name[-1]
                         stream_data.append(("heading", {"level": level, "text": element.text}))
-
-                    # elif element.name == "ul":
-                    #     items = [li.text for li in element.find_all("li")]
-                    #     stream_data.append(("list", items))
-
-                    # elif element.name == "ol":
-                    #     items = [li.text for li in element.find_all("li")]
-                    #     stream_data.append(("ordered_list", items))
 
                     elif element.name == "table":
                         headers = [th.text for th in element.find_all("th")]
                         rows = [[td.text for td in tr.find_all("td")] for tr in element.find_all("tr")]
                         stream_data.append(("table", {"headers": headers, "rows": rows}))
 
-                    elif element.name == "ol" or element.name == "ul":  
-                        li_list = element.find_all('li', recursive=False)  
-                        if li_list[0].find('strong', recursive=False):
+                    elif element.name in ["ol", "ul"]:
+                        li_list = element.find_all('li', recursive=False)
+                        
+                        if li_list and li_list[0].find('strong', recursive=False):
                             strong_tag = li_list[0].find('strong', recursive=False)
-                            print("Header Valueee:", strong_tag.text)  
+                            print("Header Value:", strong_tag.text)
                             stream_data.append(("heading", {"level": "1", "text": strong_tag.text}))
-                            
-                         #   
+
                         items = [li.text for li in element.find_all("li", recursive=False) if not li.find('strong', recursive=False)]
-                        print('li list: ', items)
+                        print('li list:', items)
+                        
                         stream_data.append(("list", items))
-                            
+
+                        if any(li.find('ul') or li.find('ol') for li in li_list):
+                            tree_data = self._parse_nested_list(element)
+                            stream_data.append(("tree", {"children": tree_data}))
 
                     elif element.name == "img":
                         if element['src'].startswith('data'):
@@ -217,15 +243,17 @@ class DocumentationPage(Page):
 
                 self.body = self.body.stream_block.to_python(stream_data)
             else:
-                print("Error: No valid content found in the Word document.")
                 raise ValueError("No valid content found in the Word document.")
 
         headings = []
-        for block in self.body: 
+        for block in self.body:
             if block.block_type == 'heading':
                 headings.append(block.value['text'])
 
-        self.heading_texts = '\n'.join(headings) 
+        self.heading_texts = '\n'.join(headings)
 
         super().save(*args, **kwargs)
+
+
+
 

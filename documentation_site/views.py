@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 def convert_docx_mammoth_to_html(request): 
     # Path to the .docx file 
-    docx_file = 'documentation_site/static/example03.docx' 
+    docx_file = 'documentation_site/static/nested.docx' 
     # Custom style map 
     custom_style_map = """table => table.table-bordered""" 
      
