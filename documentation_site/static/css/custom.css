@@ -1,9 +1,13 @@
 /* Color Theme */
 :root {
-    --primary-color: #2a1a1f; /* Deep Rosewood */
-    --secondary-color: #4b2e39; /* Dark Wine Purple */
-    --accent-color: #ff4d6d; /* Dark Pink */
+    --primary-color: #1f1f1f; /* Black */
+    --secondary-color: #2d2d2d; /* Dark Gray */
+    /* --accent-color: #e91e63; Neon Pink */
+    --accent-color: #eaaa0a;
 }
+
+
+
 
 #sidebar-right {
     position: fixed;
