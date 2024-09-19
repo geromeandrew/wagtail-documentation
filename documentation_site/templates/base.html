@@ -52,7 +52,10 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-lg">
             <div class="navbar-collapse collapse justify-content-between" id="navbarNav">
-                <a class="navbar-brand mx-5" href="/" style="color: white; font-size: 1.5rem;">OrderDocs</a>
+                <a class="navbar-brand mx-5" href="/">
+                    <img src="/static/logo.png" alt="FortemDocs Logo" style="height: 50px; width: 50px; margin-right: 10px;">
+                    <span style="color: white; font-size: 1.5rem;">FortemDocs</span>
+                </a>
                 <ul class="navbar-nav mx-5">
                     {% for child in page.get_children.live %}
                         <li class="nav-item">
