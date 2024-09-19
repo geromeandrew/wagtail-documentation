@@ -18,10 +18,16 @@ class ParagraphBlock(blocks.RichTextBlock):
         icon = 'doc-full'
         label = 'Paragraph'
 
+    def __init__(self, required=False, **kwargs):
+        super().__init__(required=required, **kwargs)
+
 class ImageBlock(ImageChooserBlock):
     class Meta:
         icon = 'image'
         label = 'Image'
+
+    def __init__(self, required=False, **kwargs):
+        super().__init__(required=required, **kwargs)
 
 class CodeBlock(blocks.StructBlock):
     language = blocks.ChoiceBlock(choices=[
@@ -29,8 +35,8 @@ class CodeBlock(blocks.StructBlock):
         ('html', 'HTML'),
         ('css', 'CSS'),
         ('javascript', 'Javascript'),
-    ])
-    code = blocks.TextBlock()
+    ], required=False)
+    code = blocks.TextBlock(required=False)
 
     class Meta:
         icon = 'code'
@@ -42,7 +48,7 @@ class HeadingBlock(blocks.StructBlock):
         ('2', 'Heading 2'),
         ('3', 'Heading 3'),
     ], default='1')
-    text = blocks.CharBlock()
+    text = blocks.CharBlock(required=False)
 
     class Meta:
         icon = 'title'
@@ -50,16 +56,17 @@ class HeadingBlock(blocks.StructBlock):
 
 class ListBlock(blocks.ListBlock):
     def __init__(self, **kwargs):
-        super().__init__(blocks.CharBlock(), **kwargs)
+        super().__init__(blocks.CharBlock(required=False), **kwargs)
 
     class Meta:
         label = 'List Item'
 
 class TableBlock(blocks.StructBlock):
-    headers = blocks.ListBlock(blocks.CharBlock(), label='Headers')
+    headers = blocks.ListBlock(blocks.CharBlock(required=False), label='Headers', required=False)
     rows = blocks.ListBlock(
-        blocks.ListBlock(blocks.CharBlock(), label='Row'),
-        label='Rows'
+        blocks.ListBlock(blocks.CharBlock(required=False), label='Row', required=False),
+        label='Rows',
+        required=False
     )
 
     class Meta:
@@ -76,28 +83,28 @@ class FourthChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
     child_img = ImageBlock(required=False)
-    child = blocks.ListBlock(FifthChildBlock())
+    child = blocks.ListBlock(FifthChildBlock(), required=False)
 
 class ThirdChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
     child_img = ImageBlock(required=False)
-    child = blocks.ListBlock(FourthChildBlock())
+    child = blocks.ListBlock(FourthChildBlock(), required=False)
         
 class SecondChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
     child_img = ImageBlock(required=False)
-    child = blocks.ListBlock(ThirdChildBlock())
+    child = blocks.ListBlock(ThirdChildBlock(), required=False)
         
 class FirstChildBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=False, max_length=255)
     content = blocks.RichTextBlock(required=False)
     child_img = ImageBlock(required=False)
-    child = blocks.ListBlock(SecondChildBlock())
+    child = blocks.ListBlock(SecondChildBlock(), required=False)
 
 class TreeBlock(blocks.StructBlock):
-    children = blocks.ListBlock(FirstChildBlock())
+    children = blocks.ListBlock(FirstChildBlock(), required=False)
 
     class Meta:
         icon = "list-ul"
@@ -142,6 +149,14 @@ class DocumentationPage(Page):
             if soup:
                 for element in soup.children:  
                     if element.name == "p":
+                        if element.find("img"):
+                            img_tag = element.find("img")
+                            if img_tag['src'].startswith('data'):
+                                _, image_data = img_tag['src'].split(',', 1)
+                                image_name = img_tag.get('alt', 'uploaded_image')
+                                image = Image(file=ContentFile(base64.b64decode(image_data), name=f"{slugify(image_name)}.png"))
+                                image.save()
+                                stream_data.append(("image", image))
                         strong_tag = element.find("strong")
                         if strong_tag and strong_tag.find("img"):
                             img_tag = strong_tag.find("img")
